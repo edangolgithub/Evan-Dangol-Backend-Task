@@ -1,15 +1,5 @@
 # Evan-Dangol-Backend-Task
 
-## Project Structure
-```
-/project-root
-├── /backend
-├── /dbscript
-├── /dbvol
-├── docker-compose.yml
-├── README.md
-```
-
 ## Prerequisites
 
 - Docker: Install Docker from [here](https://docs.docker.com/get-docker/).
