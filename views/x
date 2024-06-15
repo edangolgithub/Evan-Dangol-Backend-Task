@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{title}}</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>API Test</h1>
+        <div class="card p-3 shadow">
+            <div class="form-group">
+                <h2>GET Tasks</h2>
+                <button class="btn btn-primary" onclick="getData()">Fetch Tasks</button>
+            </div>
+            <div class="result">
+                <table class="table table-responsive" id="taskTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="taskBody">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card p-3 my-2 shadow">
+            <div class="form-group">
+                <h2 class="mb-4">POST Tasks</h2>
+                <form id="dataForm">
+
+                    <div class="form-group">
+                        <label for="postTitle">Title</label>
+                        <input type="text" class="form-control" id="postTitle" placeholder="Enter title">
+                    </div>
+                    <div class="form-group">
+                        <label for="postDescription">Description</label>
+                        <textarea class="form-control" id="postDescription" rows="3" placeholder="Enter description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="postStatus">Status</label>
+                        <select class="form-control" id="postStatus">
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="postData()">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card p-3 shadow">
+            <div class="form-group">
+                <h2>UPDATE/DELETE Tasks</h2>
+                <div class="form-group">
+                    <label for="taskSelect">Select Task</label>
+                    <select class="form-control" id="taskSelect" onchange="selectTask()">
+                        <option value="">Select a task</option>
+                    </select>
+                </div>
+                <form id="updateForm" style="display: none;">
+                    <input type="hidden" id="updateId">
+                    <div class="form-group">
+                        <label for="updateTitle">Title</label>
+                        <input type="text" class="form-control" id="updateTitle">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateDescription">Description</label>
+                        <textarea class="form-control" id="updateDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="updateStatus">Status</label>
+                        <select class="form-control" id="updateStatus">
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="updateTask()">Update</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteTask()">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function getData() {
+            try {
+                const response = await fetch('/tasks');
+                const data = await response.json();
+                displayData(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        async function postData() {
+            const title = document.getElementById('postTitle').value;
+            const description = document.getElementById('postDescription').value;
+            const status = document.getElementById('postStatus').value;
+
+            const dataToPost = {
+                title: title,
+                description: description,
+                status: status,
+            };
+            try {
+                const response = await fetch('/tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dataToPost)
+                });
+                const result = await response.json();
+                console.log(result);
+                getData(); // Refresh the task list
+            } catch (error) {
+                console.error('Error posting data:', error);
+            }
+        }
+
+        async function updateTask() {
+            const id = document.getElementById('updateId').value;
+            const title = document.getElementById('updateTitle').value;
+            const description = document.getElementById('updateDescription').value;
+            const status = document.getElementById('updateStatus').value;
+
+            const dataToUpdate = {
+                title: title,
+                description: description,
+                status: status,
+            };
+            try {
+                const response = await fetch(`/tasks/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dataToUpdate)
+                });
+                const result = await response.json();
+                console.log(result);
+                getData(); // Refresh the task list
+            } catch (error) {
+                console.error('Error updating data:', error);
+            }
+        }
+
+        async function deleteTask() {
+            const id = document.getElementById('updateId').value;
+            try {
+                const response = await fetch(`/tasks/${id}`, {
+                    method: 'DELETE',
+                });
+                const result = await response.json();
+                console.log(result);
+                getData(); // Refresh the task list
+            } catch (error) {
+                console.error('Error deleting data:', error);
+            }
+        }
+
+        function displayData(tasks) {
+            const taskBody = document.getElementById('taskBody');
+            const taskSelect = document.getElementById('taskSelect');
+            taskBody.innerHTML = '';
+            taskSelect.innerHTML = '<option value="">Select a task</option>';
+
+            if (tasks.length === 0) {
+                taskBody.innerHTML = '<tr><td colspan="5">No tasks found.</td></tr>';
+                return;
+            }
+
+            tasks.forEach(task => {
+                const tr = document.createElement('tr');
+
+                const id = document.createElement('td');
+                id.innerText = task.id;
+                tr.appendChild(id);
+
+                const title = document.createElement('td');
+                title.innerText = task.title;
+                tr.appendChild(title);
+
+                const description = document.createElement('td');
+                description.innerText = task.description;
+                tr.appendChild(description);
+
+                const status = document.createElement('td');
+                status.innerText = task.status;
+                tr.appendChild(status);
+
+                const action = document.createElement('td');
+                const editButton = document.createElement('button');
+                editButton.className = 'btn btn-primary';
+                editButton.innerText = 'Edit';
+                editButton.onclick = () => selectTaskForEdit(task);
+                action.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'btn btn-danger ml-2';
+                deleteButton.innerText = 'Delete';
+                deleteButton.onclick = () => deleteTask(task.id);
+                action.appendChild(deleteButton);
+
+                tr.appendChild(action);
+
+                taskBody.appendChild(tr);
+
+                const option = document.createElement('option');
+                option.value = task.id;
+                option.innerText = `${task.id}: ${task.title}`;
+                taskSelect.appendChild(option);
+            });
+
+            const taskTable = document.getElementById('taskTable');
+            taskTable.style.display = 'table';
+        }
+
+        function selectTaskForEdit(task) {
+            document.getElementById('updateId').value = task.id;
+            document.getElementById('updateTitle').value = task.title;
+            document.getElementById('updateDescription').value = task.description;
+            document.getElementById('updateStatus').value = task.status;
+            document.getElementById('updateForm').style.display = 'block';
+        }
+
+        function selectTask() {
+            const taskSelect = document.getElementById('taskSelect');
+            const selectedTaskId = taskSelect.value;
+            if (selectedTaskId) {
+                const selectedTask = Array.from(document.querySelectorAll('#taskBody tr')).find(row => row.children[0].innerText === selectedTaskId);
+                if (selectedTask) {
+                    const task = {
+                        id: selectedTask.children[0].innerText,
+                        title: selectedTask.children[1].innerText,
+                        description: selectedTask.children[2].innerText,
+                        status: selectedTask.children[3].innerText,
+                    };
+                    selectTaskForEdit(task);
+                }
+            } else {
+                document.getElementById('updateForm').style.display = 'none';
+            }
+        }
+    </script>
+
+</body>
+
+</html>
