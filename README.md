@@ -23,6 +23,7 @@ if there is issue with dbvol folder run=> sudo chown -R $USER $PWD/dbvol
 ### Access the Application
 
 * **Application**: [http://localhost:8009](http://localhost:8009)
+* **Application**: [http://localhost:8009](http://localhost:8009)
 * **phpMyAdmin**: [http://localhost:8080](http://localhost:8080) (use `root` and `secrET123#@` as username and password)
 
 
