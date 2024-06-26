@@ -8,7 +8,7 @@ class TaskService {
             const tasks = await connection.query('SELECT * FROM tasks');
             return tasks;
         } catch (error) {
-            console.error('Error fetching all tasks:', error);
+            console.error('Error fetching tasks:', error);
             throw new Error('Could not retrieve tasks');
         }
     }
@@ -55,8 +55,8 @@ class TaskService {
             console.log(result);
             return result.affectedRows === 0 ? null : true;
         } catch (error) {
-            console.error(`Error updating task`, error);
-            throw new Error('Could not update task');
+            console.error(`Error deleting  task`, error);
+            throw new Error('Could not delete task');
         }
 
     }
