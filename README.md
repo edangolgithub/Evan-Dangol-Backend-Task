@@ -29,5 +29,5 @@ if there is issue with dbvol folder run=> sudo chown -R $USER $PWD/dbvol
 
 
 * Users can create, read, update, and delete tasks.
-* Tasks are displayed in a paginated list on the frontend.
+* Tasks are displayed in a list on the frontend.
 
