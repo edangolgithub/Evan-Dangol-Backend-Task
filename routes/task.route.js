@@ -30,6 +30,10 @@ router.get('/:id', authenticateToken, async (req, res) => {
 
 router.post('/', authenticateToken, async (req, res) => {
     try {
+        if (!req.body || !req.body.title) {
+            return res.status(400).send('Bad Request');
+        }
+
         console.log(req.body);
         const newTask = await TaskService.createTask(req.body);
         res.status(201).json(newTask);
@@ -41,6 +45,9 @@ router.post('/', authenticateToken, async (req, res) => {
 
 router.put('/:id', authenticateToken, async (req, res) => {
     try {
+        if (!req.body) {
+            return res.status(400).send('Bad Request');
+        }
         const updatedTask = await TaskService.updateTask(req.params.id, req.body);
 
         if (!updatedTask) {
